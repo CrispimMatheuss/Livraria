@@ -1,4 +1,7 @@
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -9,60 +12,125 @@ public class Main {
     private static int proximoCodigoEmprestimo = 1; // Inicializa o próximo código disponível
 
     public static void main(String[] args) {
-
-        chamaMenuPrincipal();
+        SwingUtilities.invokeLater(() -> {
+            chamaMenuPrincipal();
+        });
     }
 
-    public static void chamaMenuPrincipal() {
-        String[] opcoesMenu = {"Cadastro de Livros", "Exibir Acervo de Livros", "Empréstimo de Livros", "Devolução de Livros", "Relatório de Empréstimos", "Sair"};
-        int opcao = JOptionPane.showOptionDialog(null, "Escolha uma opção:",
-                "Menu Principal",
-                JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, opcoesMenu, opcoesMenu[0]);
-        switch (opcao){
-            case 0:
+    private static void chamaMenuPrincipal() {
+        JFrame frame = new JFrame("Biblioteca");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menu = new JMenu("Opções");
+        JMenuItem cadastroItem = new JMenuItem("Cadastro de Livros");
+        cadastroItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
                 chamaCadastro(acervo);
-                chamaMenuPrincipal();
-            case 1:
+            }
+        });
+
+        JMenuItem listaItem = new JMenuItem("Exibir Acervo de Livros");
+        listaItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
                 chamaLista(acervo);
-                chamaMenuPrincipal();
-            case 2:
+            }
+        });
+
+        JMenuItem emprestimoItem = new JMenuItem("Empréstimo de Livros");
+        emprestimoItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
                 fazerEmprestimo(acervo);
-                chamaMenuPrincipal();
-            case 3:
+            }
+        });
+
+        JMenuItem devolucaoItem = new JMenuItem("Devolução de Livros");
+        devolucaoItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
                 fazerDevolucao(acervo);
-                chamaMenuPrincipal();
-            case 4:
+            }
+        });
+
+        JMenuItem relatorioItem = new JMenuItem("Relatório de Empréstimos");
+        relatorioItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
                 exibirEmprestimos();
-                chamaMenuPrincipal();
-            case 5:
+            }
+        });
+
+        JMenuItem sairItem = new JMenuItem("Sair");
+        sairItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
                 System.exit(0);
-        }
+            }
+        });
+
+        menu.add(cadastroItem);
+        menu.add(listaItem);
+        menu.add(emprestimoItem);
+        menu.add(devolucaoItem);
+        menu.add(relatorioItem);
+        menu.addSeparator();
+        menu.add(sairItem);
+        menuBar.add(menu);
+
+        frame.setJMenuBar(menuBar);
+        frame.setLocationRelativeTo(null);
+        frame.setPreferredSize(new Dimension(400, 300));
+        frame.pack();
+        frame.setVisible(true);
     }
 
-    public static AcervoLivro chamaCadastro(AcervoLivro acervo) {
-        boolean cadastra = true;
+    private static void chamaCadastro(AcervoLivro acervo) {
+        JFrame janelaCadastro = new JFrame("Cadastro de Livros");
+        janelaCadastro.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        while(cadastra){
-            String nomeLivro = JOptionPane.showInputDialog(null, "Digite o nome do livro: ");
-            String nomeAutor = JOptionPane.showInputDialog(null, "Digite o nome do autor: ");
-            Livro livro = new Livro(nomeLivro, nomeAutor);
-            acervo.adicionarLivro(livro);
+        JPanel painelCadastro = new JPanel();
+        painelCadastro.setLayout(new GridLayout(3, 2));
 
-            int opcaoCadastro = JOptionPane.showConfirmDialog(null, "Livro cadastrado com sucesso! Deseja cadastrar outro livro?", "Cadastro de Livros", JOptionPane.YES_NO_OPTION);
-            if (opcaoCadastro != JOptionPane.YES_OPTION) {
-                cadastra = false;
+        JLabel labelNomeLivro = new JLabel("Nome do Livro:");
+        JTextField campoNomeLivro = new JTextField();
+        JLabel labelNomeAutor = new JLabel("Nome do Autor:");
+        JTextField campoNomeAutor = new JTextField();
+
+        JButton botaoCadastrar = new JButton("Cadastrar");
+
+        botaoCadastrar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String nomeLivro = campoNomeLivro.getText();
+                String nomeAutor = campoNomeAutor.getText();
+                Livro livro = new Livro(nomeLivro, nomeAutor);
+                acervo.adicionarLivro(livro);
+                JOptionPane.showMessageDialog(null, "Livro cadastrado com sucesso!");
+                janelaCadastro.dispose();
             }
-        }
-        return acervo;
+        });
 
+        painelCadastro.add(labelNomeLivro);
+        painelCadastro.add(campoNomeLivro);
+        painelCadastro.add(labelNomeAutor);
+        painelCadastro.add(campoNomeAutor);
+        painelCadastro.add(new JLabel());
+        painelCadastro.add(botaoCadastrar);
+        janelaCadastro.setPreferredSize(new Dimension(400, 300));
+        janelaCadastro.setLocationRelativeTo(null);
+        janelaCadastro.add(painelCadastro);
+        janelaCadastro.pack();
+        janelaCadastro.setVisible(true);
     }
 
     public static void chamaLista(AcervoLivro acervo) {
         acervo.exibirAcervo();
     }
 
-    public static void fazerEmprestimo(AcervoLivro acervo) {
-        // Lista de livros disponíveis para empréstimo
+    private static void fazerEmprestimo(AcervoLivro acervo) {
         ArrayList<Livro> livrosDisponiveis = new ArrayList<>();
         for (Livro livro : acervo.getListaLivros()) {
             if (!livro.isEmprestado()) {
@@ -75,75 +143,53 @@ public class Main {
             return;
         }
 
-        // Solicita ao usuário o livro a ser emprestado
-        String[] opcoesLivros = new String[livrosDisponiveis.size()];
-        for (int i = 0; i < livrosDisponiveis.size(); i++) {
-            opcoesLivros[i] = livrosDisponiveis.get(i).getNomeLivro();
+        JFrame janelaEmprestimo = new JFrame("Empréstimo de Livros");
+        janelaEmprestimo.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel painelEmprestimo = new JPanel();
+        painelEmprestimo.setLayout(new BorderLayout());
+
+        DefaultListModel<String> listaLivrosModel = new DefaultListModel<>();
+        JList<String> listaLivros = new JList<>(listaLivrosModel);
+
+        for (Livro livro : livrosDisponiveis) {
+            listaLivrosModel.addElement(livro.getNomeLivro());
         }
 
-        int escolhaLivro = JOptionPane.showOptionDialog(null, "Escolha o livro para empréstimo:",
-                "Empréstimo de Livros",
-                JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, opcoesLivros, opcoesLivros[0]);
+        JScrollPane scrollPane = new JScrollPane(listaLivros);
+        painelEmprestimo.add(scrollPane, BorderLayout.CENTER);
 
-        // Marca o livro como emprestado
-        Livro livroSelecionado = livrosDisponiveis.get(escolhaLivro);
-        livroSelecionado.setEmprestado(true);
+        JButton botaoEmprestimo = new JButton("Empréstimo");
+        botaoEmprestimo.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedIdx = listaLivros.getSelectedIndex();
+                if (selectedIdx >= 0) {
+                    Livro livroSelecionado = livrosDisponiveis.get(selectedIdx);
+                    livroSelecionado.setEmprestado(true);
 
-        // Cria o objeto EmprestimoLivro
-        EmprestimoLivro emprestimo = new EmprestimoLivro(proximoCodigoEmprestimo, livroSelecionado, new Date());
+                    EmprestimoLivro empréstimo = new EmprestimoLivro(proximoCodigoEmprestimo, livroSelecionado, new Date());
+                    proximoCodigoEmprestimo++;
 
-        proximoCodigoEmprestimo++;
+                    emprestimos.add(empréstimo);
+                    JOptionPane.showMessageDialog(null, "Livro emprestado: " + livroSelecionado.getNomeLivro());
+                    janelaEmprestimo.dispose();
+                }
+            }
+        });
 
-        // Adiciona o empréstimo à lista de empréstimos
-        emprestimos.add(emprestimo);
+        painelEmprestimo.add(botaoEmprestimo, BorderLayout.SOUTH);
 
-        JOptionPane.showMessageDialog(null, "Livro emprestado: " + livroSelecionado.getNomeLivro());
+        janelaEmprestimo.add(painelEmprestimo);
+        janelaEmprestimo.setPreferredSize(new Dimension(400, 300));
+        janelaEmprestimo.setLocationRelativeTo(null);
+        janelaEmprestimo.pack();
+        janelaEmprestimo.setVisible(true);
     }
 
-//    public static void fazerDevolucao(AcervoLivro acervo) {
-//        // Lista de livros emprestados
-//        ArrayList<Livro> livrosEmprestados = new ArrayList<>();
-//        for (Livro livro : acervo.getListaLivros()) {
-//            if (livro.isEmprestado()) {
-//                livrosEmprestados.add(livro);
-//            }
-//        }
-//
-//        if (livrosEmprestados.isEmpty()) {
-//            JOptionPane.showMessageDialog(null, "Nenhum livro emprestado para devolução.");
-//            return;
-//        }
-//
-//        // Solicita ao usuário o livro a ser devolvido
-//        String[] opcoesLivros = new String[livrosEmprestados.size()];
-//        for (int i = 0; i < livrosEmprestados.size(); i++) {
-//            opcoesLivros[i] = livrosEmprestados.get(i).getNomeLivro();
-//        }
-//
-//        int escolhaLivro = JOptionPane.showOptionDialog(null, "Escolha o livro para devolução:",
-//                "Devolução de Livros",
-//                JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, opcoesLivros, opcoesLivros[0]);
-//
-//        // Marca o livro como devolvido
-//        Livro livroSelecionado = livrosEmprestados.get(escolhaLivro);
-//        livroSelecionado.setEmprestado(false);
-//
-//        EmprestimoLivro emprestimo = null;
-//        for (EmprestimoLivro emp : emprestimos) {
-//            if (emp.getLivro() == livroSelecionado) {
-//                emprestimo = emp;
-//                break;
-//            }
-//        }
-//
-//        emprestimo.setDataDevolucao(new Date());
-//        JOptionPane.showMessageDialog(null, "Livro devolvido: " + livroSelecionado.getNomeLivro());
-//    }
 
-    public static void fazerDevolucao(AcervoLivro acervo) {
-        // Lista de empréstimos
+    private static void fazerDevolucao(AcervoLivro acervo) {
         ArrayList<EmprestimoLivro> emprestimosAtivos = new ArrayList<>();
-
         for (EmprestimoLivro emprestimo : emprestimos) {
             if (emprestimo.getDataDevolucao() == null) {
                 emprestimosAtivos.add(emprestimo);
@@ -155,30 +201,44 @@ public class Main {
             return;
         }
 
-        // Solicita ao usuário o empréstimo a ser devolvido
-        String[] opcoesEmprestimos = new String[emprestimosAtivos.size()];
+        JFrame janelaDevolucao = new JFrame("Devolução de Livros");
+        janelaDevolucao.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        for (int i = 0; i < emprestimosAtivos.size(); i++) {
-            EmprestimoLivro emprestimo = emprestimosAtivos.get(i);
-            opcoesEmprestimos[i] = "Código: " + emprestimo.getCodigo() + " - Livro: " + emprestimo.getLivro().getNomeLivro();
+        JPanel painelDevolucao = new JPanel();
+        painelDevolucao.setLayout(new BorderLayout());
+
+        DefaultListModel<String> listaEmprestimosModel = new DefaultListModel<>();
+        JList<String> listaEmprestimos = new JList<>(listaEmprestimosModel);
+
+        for (EmprestimoLivro emprestimo : emprestimosAtivos) {
+            listaEmprestimosModel.addElement("Código: " + emprestimo.getCodigo() + " - Livro: " + emprestimo.getLivro().getNomeLivro());
         }
 
-        int escolhaEmprestimo = JOptionPane.showOptionDialog(null, "Escolha o empréstimo para devolução:",
-                "Devolução de Livros",
-                JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, opcoesEmprestimos, opcoesEmprestimos[0]);
+        JScrollPane scrollPane = new JScrollPane(listaEmprestimos);
+        painelDevolucao.add(scrollPane, BorderLayout.CENTER);
 
-        // Obtém o empréstimo selecionado
-        EmprestimoLivro emprestimoSelecionado = emprestimosAtivos.get(escolhaEmprestimo);
+        JButton botaoDevolucao = new JButton("Devolução");
+        botaoDevolucao.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedIdx = listaEmprestimos.getSelectedIndex();
+                if (selectedIdx >= 0) {
+                    EmprestimoLivro emprestimoSelecionado = emprestimosAtivos.get(selectedIdx);
+                    emprestimoSelecionado.getLivro().setEmprestado(false);
+                    emprestimoSelecionado.setDataDevolucao(new Date());
+                    JOptionPane.showMessageDialog(null, "Livro devolvido: " + emprestimoSelecionado.getLivro().getNomeLivro());
+                    janelaDevolucao.dispose();
+                }
+            }
+        });
 
-        // Marca o livro associado ao empréstimo como não emprestado
-        emprestimoSelecionado.getLivro().setEmprestado(false);
-
-        // Define a data de devolução como a data atual
-        emprestimoSelecionado.setDataDevolucao(new Date());
-
-        JOptionPane.showMessageDialog(null, "Livro devolvido: " + emprestimoSelecionado.getLivro().getNomeLivro());
+        painelDevolucao.add(botaoDevolucao, BorderLayout.SOUTH);
+        janelaDevolucao.setPreferredSize(new Dimension(400, 300));
+        janelaDevolucao.setLocationRelativeTo(null);
+        janelaDevolucao.add(painelDevolucao);
+        janelaDevolucao.pack();
+        janelaDevolucao.setVisible(true);
     }
-
 
     public static void exibirEmprestimos() {
         StringBuilder emprestimosTexto = new StringBuilder();
@@ -194,5 +254,4 @@ public class Main {
 
         JOptionPane.showMessageDialog(null, emprestimosTexto.toString(), "Lista de Empréstimos", JOptionPane.INFORMATION_MESSAGE);
     }
-
 }
